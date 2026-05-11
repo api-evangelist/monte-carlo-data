@@ -28,6 +28,16 @@ common:
     url: https://www.montecarlodata.com
   - type: Documentation
     url: https://docs.getmontecarlo.com
+  - type: Integrations
+    url: https://www.montecarlodata.com/product/integrations
+integrations:
+  - name: Clickcease
+  - name: Monte Carlo Data
+  - name: Facebook
+  - name: Instagram
+  - name: Twitter
+  - name: LinkedIn
+  - name: Monte Carlo
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
