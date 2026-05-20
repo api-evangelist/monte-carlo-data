@@ -24,6 +24,10 @@ apis:
       - type: Documentation
         url: https://docs.getmontecarlo.com
 common:
+  - type: GitHubOrganization
+    url: https://github.com/monte-carlo-data
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/monte-carlo-data
   - type: Website
     url: https://www.montecarlodata.com
   - type: Documentation
