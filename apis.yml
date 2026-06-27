@@ -34,7 +34,7 @@ common:
     url: https://docs.getmontecarlo.com
   - type: Integrations
     url: https://www.montecarlodata.com/product/integrations
-  - type: LLMsTxt
+  - type: LlmsText
     url: https://docs.getmontecarlo.com/llms.txt
 integrations:
   - name: Clickcease
