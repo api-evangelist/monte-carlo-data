@@ -24,6 +24,10 @@ apis:
       - type: Documentation
         url: https://docs.getmontecarlo.com
 common:
+  - type: TrustCenter
+    url: security/monte-carlo-data-trust-center.yml
+  - type: DomainSecurity
+    url: security/monte-carlo-data-domain-security.yml
   - type: GitHubOrganization
     url: https://github.com/monte-carlo-data
   - type: LinkedIn
@@ -36,6 +40,8 @@ common:
     url: https://www.montecarlodata.com/product/integrations
   - type: LlmsText
     url: https://docs.getmontecarlo.com/llms.txt
+  - url: https://montecarlodata.com/blog/feed/
+    type: Blog
 integrations:
   - name: Clickcease
   - name: Monte Carlo Data
