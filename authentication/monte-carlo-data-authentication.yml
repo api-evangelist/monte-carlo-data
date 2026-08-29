@@ -1,0 +1,138 @@
+generated: '2026-08-29'
+method: searched
+source: >-
+  https://docs.getmontecarlo.com/docs/api-authentication,
+  https://docs.getmontecarlo.com/docs/push-ingest-api,
+  https://docs.getmontecarlo.com/docs/mcp-server,
+  plus live reads of https://auth.getmontecarlo.com/.well-known/oauth-authorization-server
+  and https://mcp.getmontecarlo.com/.well-known/oauth-protected-resource/mcp
+docs: https://docs.getmontecarlo.com/docs/api-authentication
+provider: Monte Carlo
+providerId: monte-carlo-data
+note: >-
+  Monte Carlo publishes no OpenAPI, so this profile is derived from the auth
+  documentation and from live OAuth metadata rather than from securitySchemes.
+  Four distinct credential families exist and they are NOT interchangeable —
+  the docs are explicit that a standard API key will not work against the MCP
+  server or the Push Ingest API.
+schemes:
+  - id: mcd-api-key
+    type: apiKey
+    in: header
+    names:
+      - x-mcd-id
+      - x-mcd-token
+    surface: GraphQL API (https://api.getmontecarlo.com/graphql)
+    description: >-
+      Key ID + secret pair. Keys are generated from 42 cryptographically secure
+      random bytes, base64-encoded to a 56-character string. Secret is shown
+      once. Personal and account-level key types; account-level creation is
+      permission-gated (Account Owners by default).
+    rotation: >-
+      Maximum expiration capped at one year for personal keys, MCP keys and
+      personal OAuth clients; service credentials remain long-lived.
+    docs: https://docs.getmontecarlo.com/docs/api-authentication#creating-an-api-key
+  - id: oauth2-client-credentials
+    type: oauth2
+    flow: clientCredentials
+    surface: GraphQL API, Python SDK, CLI
+    token_url: https://api.getmontecarlo.com/oauth2/token
+    api_url: https://api.getmontecarlo.com/graphql
+    token_format: JWT bearer
+    scopes:
+      - https://api.getmontecarlo.com/access
+      - https://instance.getmontecarlo.com/{instance_id}
+    description: >-
+      Machine-to-machine authentication. Two client kinds: personal clients
+      (act as the creating user) and service clients (account-level, scoped by
+      authorization groups). Each client holds up to two secrets for
+      zero-downtime rotation. The instance-routing scope names the deployment
+      (us1, eu1, ...).
+    docs: https://docs.getmontecarlo.com/docs/api-authentication#authenticating-with-oauth-client-credentials
+  - id: oauth2.1-mcp
+    type: oauth2
+    flow: authorizationCode
+    pkce: S256
+    dynamic_client_registration: true
+    surface: MCP server (https://mcp.getmontecarlo.com/mcp)
+    authorization_server: https://auth.getmontecarlo.com
+    issuer: https://auth.getmontecarlo.com
+    authorization_endpoint: https://auth.getmontecarlo.com/oauth2/authorize
+    token_endpoint: https://auth.getmontecarlo.com/oauth2/token
+    registration_endpoint: https://auth.getmontecarlo.com/oauth2/register
+    introspection_endpoint: https://auth.getmontecarlo.com/oauth2/introspection
+    device_authorization_endpoint: https://auth.getmontecarlo.com/oauth2/device_authorization
+    jwks_uri: https://auth.getmontecarlo.com/oauth2/jwks
+    userinfo_endpoint: https://auth.getmontecarlo.com/oauth2/userinfo
+    grant_types:
+      - authorization_code
+      - refresh_token
+      - client_credentials
+      - urn:ietf:params:oauth:grant-type:device_code
+    scopes:
+      - openid
+      - profile
+      - email
+      - offline_access
+    token_endpoint_auth_methods:
+      - none
+      - client_secret_basic
+      - client_secret_post
+    description: >-
+      OAuth 2.1 with Dynamic Client Registration for MCP clients. Probed live:
+      the MCP endpoint returns a conformant RFC 9728 challenge pointing at its
+      protected-resource metadata. Requires an Editor role or above.
+    method: probed
+  - id: mcp-server-key
+    type: apiKey
+    in: header
+    names:
+      - Authorization
+      - x-mcd-id
+      - x-mcd-token
+    format: 'Authorization: Bearer <KEY_ID>:<KEY_SECRET>'
+    surface: MCP server
+    description: >-
+      Scoped credentials that work ONLY with the MCP server. Standard API keys
+      are rejected. Created via UI, `montecarlo mcp create-key`, or the
+      createMcpIntegrationKey GraphQL mutation (CLI v0.141.4+).
+    docs: https://docs.getmontecarlo.com/docs/mcp-server
+  - id: ingestion-key
+    type: apiKey
+    in: header
+    names:
+      - x-mcd-id
+      - x-mcd-token
+    surface: Push Ingest API (https://integrations.getmontecarlo.com)
+    scope_value: Ingestion
+    description: >-
+      A dedicated integration key with scope `Ingestion`, optionally bound to
+      specific warehouseIds. A standard Monte Carlo API key will not work.
+      Created with the createIntegrationKey GraphQL mutation or
+      `montecarlo integrations create-key --scope Ingestion`.
+    docs: https://docs.getmontecarlo.com/docs/push-ingest-api#prerequisites
+  - id: webhook-hmac
+    type: signature
+    direction: inbound-to-customer
+    algorithm: HMAC-SHA-512
+    header: x-mcd-signature
+    description: >-
+      Outbound webhook calls from Monte Carlo are optionally signed with a
+      customer-supplied shared secret so the receiver can verify authenticity.
+    docs: https://docs.getmontecarlo.com/docs/webhooks
+sso:
+  supported: true
+  note: >-
+    SSO with enforced password-login disablement, single-use recovery codes,
+    and a per-account IP allowlist on the redeem endpoint.
+  docs: https://docs.getmontecarlo.com/docs/sso-recovery-codes
+network_access_control:
+  supported: true
+  scopes:
+    - MCP
+    - API
+    - Ingestion
+    - UI
+    - Agent
+    - OpenTelemetry
+  docs: https://docs.getmontecarlo.com/docs/network-access-control

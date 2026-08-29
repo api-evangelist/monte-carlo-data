@@ -1,0 +1,144 @@
+generated: '2026-08-29'
+method: probed
+source: live HTTPS probes of every Monte Carlo host named in apis.yml, the docs, and the API reference
+provider: Monte Carlo
+providerId: monte-carlo-data
+note: >-
+  Monte Carlo serves a real, non-trivial /.well-known surface: an RFC 9116
+  security.txt with a working disclosure Policy, an RFC 9727 api-catalog
+  linkset that points at the docs, the API reference and the status page, and
+  the full OAuth 2.1 discovery pair behind the MCP server. Two probe results
+  are deliberately recorded as misses: getmontecarlo.com answers 200 with the
+  same 22KB marketing HTML for every /.well-known/* path (an SPA catch-all,
+  not a document), and api.getmontecarlo.com / integrations.getmontecarlo.com
+  return 403 on every path because the edge rejects unauthenticated requests
+  outright.
+hosts:
+  - host: www.montecarlodata.com
+    note: >-
+      Corporate site. Now 301s to montecarlo.ai after the 2026 rebrand; both
+      hostnames serve the identical security.txt and api-catalog bodies.
+    documents:
+      - path: /.well-known/security.txt
+        status: 200
+        content_type: text/plain
+        file: monte-carlo-data-security.txt
+      - path: /.well-known/api-catalog
+        status: 200
+        content_type: application/linkset+json
+        file: monte-carlo-data-api-catalog.json
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: montecarlo.ai
+    note: Rebranded corporate domain; serves the same two documents as www.montecarlodata.com.
+    documents:
+      - path: /.well-known/security.txt
+        status: 200
+        content_type: text/plain
+        file: monte-carlo-data-security.txt
+      - path: /.well-known/api-catalog
+        status: 200
+        content_type: application/linkset+json
+        file: monte-carlo-data-api-catalog.json
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: mcp.getmontecarlo.com
+    note: >-
+      Hosted MCP server. The RFC 9728 protected-resource metadata is served
+      from the resource-scoped path; the bare path answers with the us1
+      instance resource.
+    documents:
+      - path: /.well-known/oauth-protected-resource/mcp
+        status: 200
+        content_type: application/json
+        file: monte-carlo-data-oauth-protected-resource.json
+      - path: /.well-known/oauth-protected-resource
+        status: 200
+        content_type: application/json
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: auth.getmontecarlo.com
+    note: OAuth 2.1 / OIDC authorization server behind the MCP endpoint and the API.
+    documents:
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        content_type: application/json
+        file: monte-carlo-data-oauth-authorization-server.json
+      - path: /.well-known/openid-configuration
+        status: 200
+        content_type: application/json
+        file: monte-carlo-data-openid-configuration.json
+  - host: api.getmontecarlo.com
+    note: >-
+      GraphQL API host. The edge returns 403 with {"message":"Forbidden"} for
+      every unauthenticated path including /.well-known/*, so nothing here can
+      be probed anonymously. Not a 404 — an authorization wall.
+    documents:
+      - path: /.well-known/security.txt
+        status: 403
+      - path: /.well-known/openid-configuration
+        status: 403
+      - path: /.well-known/oauth-authorization-server
+        status: 403
+      - path: /.well-known/api-catalog
+        status: 403
+      - path: /.well-known/agent-card.json
+        status: 403
+      - path: /.well-known/agent.json
+        status: 403
+  - host: integrations.getmontecarlo.com
+    note: Push Ingest API host; same 403-on-everything edge policy as api.getmontecarlo.com.
+    documents:
+      - path: /.well-known/security.txt
+        status: 403
+      - path: /.well-known/api-catalog
+        status: 403
+  - host: docs.getmontecarlo.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: getmontecarlo.com
+    note: >-
+      FALSE POSITIVE WARNING — this host answers HTTP 200 with a 22,478-byte
+      marketing HTML page for /.well-known/openid-configuration,
+      /oauth-authorization-server and /api-catalog. It is an SPA catch-all, not
+      a document. Recorded as a miss.
+    documents:
+      - path: /.well-known/openid-configuration
+        status: 200
+        content_type: text/html
+        result: html-shell-not-a-document
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        content_type: text/html
+        result: html-shell-not-a-document
+      - path: /.well-known/api-catalog
+        status: 200
+        content_type: text/html
+        result: html-shell-not-a-document
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404

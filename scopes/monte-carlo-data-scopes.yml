@@ -1,0 +1,64 @@
+generated: '2026-08-29'
+method: searched
+source: >-
+  live read of https://auth.getmontecarlo.com/.well-known/oauth-authorization-server
+  and https://mcp.getmontecarlo.com/.well-known/oauth-protected-resource/mcp,
+  plus https://docs.getmontecarlo.com/docs/api-authentication
+docs: https://docs.getmontecarlo.com/docs/api-authentication
+provider: Monte Carlo
+providerId: monte-carlo-data
+note: >-
+  Monte Carlo runs two distinct OAuth scope vocabularies. The MCP/OIDC
+  authorization server at auth.getmontecarlo.com advertises the standard OIDC
+  set plus offline_access. The GraphQL API's client-credentials flow uses
+  resource-URI scopes instead — an access scope plus an instance-routing scope
+  that names the deployment region. Fine-grained permissioning in Monte Carlo
+  is NOT expressed as OAuth scopes: it is carried by roles, authorization
+  groups and domains, which is why the scope list is short.
+authorization_servers:
+  - issuer: https://auth.getmontecarlo.com
+    metadata: https://auth.getmontecarlo.com/.well-known/oauth-authorization-server
+    openid_configuration: https://auth.getmontecarlo.com/.well-known/openid-configuration
+    scopes:
+      - name: openid
+        description: OIDC — issue an ID token for the authenticating user.
+      - name: profile
+        description: OIDC — basic profile claims.
+      - name: email
+        description: OIDC — email claim.
+      - name: offline_access
+        description: >-
+          Issue a refresh token. This is the ONLY scope the MCP protected
+          resource declares as supported (scopes_supported in
+          /.well-known/oauth-protected-resource/mcp), and it is the scope named
+          in the MCP endpoint's WWW-Authenticate challenge.
+  - issuer: https://api.getmontecarlo.com
+    flow: client_credentials
+    token_endpoint: https://api.getmontecarlo.com/oauth2/token
+    scopes:
+      - name: https://api.getmontecarlo.com/access
+        description: Grants access to the Monte Carlo GraphQL API.
+      - name: https://instance.getmontecarlo.com/{instance_id}
+        description: >-
+          Instance-routing scope naming the customer's deployment (e.g. us1,
+          eu1). Required alongside the access scope; the instance ID is shown
+          under Account Information -> Instance ID.
+        templated: true
+protected_resources:
+  - resource: https://mcp.getmontecarlo.com/mcp
+    authorization_servers:
+      - https://auth.getmontecarlo.com
+    scopes_supported:
+      - offline_access
+    bearer_methods_supported:
+      - header
+    metadata_url: https://mcp.getmontecarlo.com/.well-known/oauth-protected-resource/mcp
+    http_status: 200
+non_oauth_authorization:
+  model: roles + authorization groups + domains
+  note: >-
+    MCP access requires the Editor role or above. Account-level API key
+    creation, service OAuth client creation and SSO editing are each governed
+    by named role permissions. Ingestion keys are additionally scoped by
+    warehouseIds.
+  docs: https://docs.getmontecarlo.com/docs/authorization

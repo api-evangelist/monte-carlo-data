@@ -1,78 +1,240 @@
 aid: monte-carlo-data
 name: Monte Carlo
 description: >-
-  Monte Carlo is a data observability platform that uses ML to detect, resolve, and prevent data quality issues.
+  Monte Carlo is the data + AI observability platform that detects, resolves and
+  prevents data quality incidents across warehouses, lakes, BI tools, ETL
+  orchestrators and, increasingly, AI agents. Its programmatic surface is a
+  single GraphQL API at api.getmontecarlo.com/graphql that exposes everything
+  the web app shows — alerts, incidents, monitors, assets, table and column
+  lineage, query history and job performance — alongside a REST Push Ingest API
+  at integrations.getmontecarlo.com for pushing metadata, lineage and query logs
+  from sources the pull-based collectors cannot reach. Monte Carlo also runs a
+  first-party hosted MCP server with 56 documented tools and OAuth 2.1 dynamic
+  client registration, publishes 19 Apache-2.0 Agent Skills for coding agents,
+  and ships a Python SDK (pycarlo), a CLI (montecarlodata) and an OpenTelemetry
+  SDK for agent tracing. The company rebranded its web presence to montecarlo.ai
+  during 2026; montecarlodata.com still resolves and serves the same content.
 type: Index
 deliveryModel:
-  model: unknown
+  model: saas
   open_source: false
-  commercial: false
-  callable_host: false
-  label: Delivery model not determined — needs a product licence on record
-  confidence: low
+  commercial: true
+  callable_host: true
+  label: Commercial SaaS with a callable multi-tenant API and a hosted MCP server
+  confidence: high
   source:
-  - none
-  generated: '2026-08-28'
-  method: derived
+    - https://docs.getmontecarlo.com/docs/api
+    - https://docs.getmontecarlo.com/docs/mcp-server
+    - https://docs.getmontecarlo.com/docs/integration-feature-lifecycles
+  generated: '2026-08-29'
+  method: searched
 accessModel:
-  pricing: freemium
-  onboarding: unknown
+  pricing: enterprise-quoted
+  onboarding: sales
   trial: false
   try_now: false
   public: false
-  label: Freemium
-  confidence: medium
+  label: Enterprise, sales-quoted
+  confidence: high
   source:
-  - plans
-  generated: '2026-07-22'
-  method: derived
+    - plans
+    - https://montecarlo.ai/request-for-pricing/
+  generated: '2026-08-29'
+  method: searched
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/monte-carlo-data.png
 tags:
   - AIOps
   - Data Observability
+  - Data Quality
+  - Data Lineage
+  - Agent Observability
+  - Monitoring
+  - GraphQL
+  - Model Context Protocol
+  - OpenTelemetry
+  - Data Engineering
 url: >-
   https://raw.githubusercontent.com/api-evangelist/monte-carlo-data/refs/heads/main/apis.yml
 created: '2026-03-27'
-modified: '2026-03-27'
+modified: '2026-08-29'
 specificationVersion: '0.23'
 apis:
   - aid: monte-carlo-data:monte-carlo-data
-    name: Monte Carlo
+    name: Monte Carlo GraphQL API
     description: >-
-      Monte Carlo is a data observability platform that uses ML to detect, resolve, and prevent data quality issues.
-    humanURL: https://www.montecarlodata.com
+      Monte Carlo's single GraphQL endpoint. Every piece of information the web
+      application presents can be retrieved and mutated programmatically —
+      alerts and incidents, monitors and monitors-as-code, assets, table and
+      column lineage, query history, job and task performance, domains,
+      authorization groups, and API/OAuth/MCP credential management. Authenticate
+      with an x-mcd-id / x-mcd-token key pair or with an OAuth 2.0
+      client-credentials bearer token. Introspection is auth-gated, so no SDL is
+      publicly downloadable; a generated HTML reference is published at
+      apidocs.getmontecarlo.com and an in-browser GraphiQL explorer at
+      getmontecarlo.com/graphiql.
+    humanURL: https://docs.getmontecarlo.com/docs/api
+    baseURL: https://api.getmontecarlo.com/graphql
     tags:
       - AIOps
+      - GraphQL
+      - Data Observability
     properties:
       - type: Documentation
-        url: https://docs.getmontecarlo.com
+        url: https://docs.getmontecarlo.com/docs/api
+      - type: APIReference
+        url: https://apidocs.getmontecarlo.com/
+      - type: GraphQL
+        url: https://api.getmontecarlo.com/graphql
+      - type: Authentication
+        url: authentication/monte-carlo-data-authentication.yml
+      - type: OAuthScopes
+        url: scopes/monte-carlo-data-scopes.yml
+  - aid: monte-carlo-data:push-ingest-api
+    name: Monte Carlo Push Ingest API
+    description: >-
+      A REST write API for pushing observability data into Monte Carlo from
+      sources its pull-based collectors cannot reach. Three endpoints —
+      POST /ingest/v1/metadata (table and view schema, columns, row and byte
+      counts, freshness), POST /ingest/v1/lineage (table- and column-level
+      lineage) and POST /ingest/v1/querylogs (SQL query history) — each
+      returning 202 Accepted with an invocation_id. Requires a dedicated
+      Ingestion-scoped integration key; standard API keys are rejected. Public
+      preview, Enterprise plan or higher.
+    humanURL: https://docs.getmontecarlo.com/docs/push-ingest-api
+    baseURL: https://integrations.getmontecarlo.com
+    tags:
+      - Data Observability
+      - Data Lineage
+      - Ingest
+    properties:
+      - type: Documentation
+        url: https://docs.getmontecarlo.com/docs/push-ingest-api
+      - type: ErrorCatalog
+        url: errors/monte-carlo-data-problem-types.yml
+  - aid: monte-carlo-data:mcp-server
+    name: Monte Carlo MCP Server
+    description: >-
+      A first-party, fully hosted Model Context Protocol server that gives AI
+      agents direct access to Monte Carlo — investigating alerts, exploring
+      assets and lineage, creating and tuning monitors, and evaluating AI agent
+      performance. 56 documented tools across three toolsets (default, extended,
+      agent_observability) plus four published MCP prompts. Reached over
+      streamable HTTP with OAuth 2.1 and dynamic client registration, or with
+      MCP-scoped keys; also shipped as an Anthropic-verified connector in the
+      Claude Connectors Directory. Runs on AWS Lambda, stateless, executing
+      under the calling user's Monte Carlo identity.
+    humanURL: https://docs.getmontecarlo.com/docs/mcp-server
+    baseURL: https://mcp.getmontecarlo.com/mcp
+    tags:
+      - Model Context Protocol
+      - Agent Observability
+      - AIOps
+    properties:
+      - type: MCPServer
+        url: mcp/monte-carlo-data-mcp.yml
+      - type: ToolCrosswalk
+        url: mcp/monte-carlo-data-tool-crosswalk.yml
+      - type: Documentation
+        url: https://docs.getmontecarlo.com/docs/mcp-server
 common:
-  - type: TrustCenter
-    url: security/monte-carlo-data-trust-center.yml
-  - type: DomainSecurity
-    url: security/monte-carlo-data-domain-security.yml
+  - type: Website
+    url: https://www.montecarlodata.com
+  - type: DeveloperPortal
+    url: https://docs.getmontecarlo.com
+  - type: Documentation
+    url: https://docs.getmontecarlo.com
+  - type: APIReference
+    url: https://apidocs.getmontecarlo.com/
+  - type: GettingStarted
+    url: https://docs.getmontecarlo.com/docs/welcome
+  - type: Blog
+    url: https://montecarlodata.com/blog/feed/
   - type: GitHubOrganization
     url: https://github.com/monte-carlo-data
   - type: LinkedIn
     url: https://www.linkedin.com/company/monte-carlo-data
-  - type: Website
-    url: https://www.montecarlodata.com
-  - type: Documentation
-    url: https://docs.getmontecarlo.com
   - type: Integrations
     url: https://www.montecarlodata.com/product/integrations
-  - type: LlmsText
-    url: https://docs.getmontecarlo.com/llms.txt
-  - url: https://montecarlodata.com/blog/feed/
-    type: Blog
+  - type: Pricing
+    url: https://montecarlo.ai/request-for-pricing/
+  - type: TermsOfService
+    url: https://montecarlo.ai/terms-of-service
+  - type: PrivacyPolicy
+    url: https://montecarlo.ai/privacy-policy
+  - type: StatusPage
+    url: https://status.getmontecarlo.com/
+  - type: ChangeLog
+    url: https://docs.getmontecarlo.com/changelog
+  - type: ChangeLog
+    url: changelog/monte-carlo-data-changelog.yml
+  - type: LLMsTxt
+    url: llms/monte-carlo-data-llms.txt
+  - type: Packages
+    url: packages/monte-carlo-data-packages.yml
+  - type: SDKs
+    url: packages/monte-carlo-data-packages.yml
+  - type: CLI
+    url: cli/monte-carlo-data-cli.yml
+  - type: WellKnown
+    url: well-known/monte-carlo-data-well-known.yml
+  - type: SecurityTxt
+    url: well-known/monte-carlo-data-security.txt
+  - type: Security
+    url: security/monte-carlo-data-vulnerability-disclosure.yml
+  - type: VulnerabilityDisclosure
+    url: security/monte-carlo-data-vulnerability-disclosure.yml
+  - type: TrustCenter
+    url: security/monte-carlo-data-trust-center.yml
+  - type: Compliance
+    url: security/monte-carlo-data-trust-center.yml
+  - type: DomainSecurity
+    url: security/monte-carlo-data-domain-security.yml
+  - type: Conformance
+    url: conformance/monte-carlo-data-conformance.yml
+  - type: Authentication
+    url: authentication/monte-carlo-data-authentication.yml
+  - type: OAuthScopes
+    url: scopes/monte-carlo-data-scopes.yml
+  - type: Conventions
+    url: conventions/monte-carlo-data-conventions.yml
+  - type: ErrorCatalog
+    url: errors/monte-carlo-data-problem-types.yml
+  - type: Lifecycle
+    url: lifecycle/monte-carlo-data-lifecycle.yml
+  - type: Plans
+    url: plans/monte-carlo-data-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/monte-carlo-data-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/monte-carlo-data-webhooks.yml
+  - type: AgentSkill
+    url: skills/_index.yml
 integrations:
-  - name: Clickcease
-  - name: Monte Carlo Data
-  - name: Facebook
-  - name: Instagram
-  - name: Twitter
-  - name: LinkedIn
-  - name: Monte Carlo
+  - name: Snowflake
+  - name: Databricks
+  - name: Google BigQuery
+  - name: Amazon Redshift
+  - name: Microsoft Azure
+  - name: dbt
+  - name: Apache Airflow
+  - name: Tableau
+  - name: Looker
+  - name: Slack
+  - name: Microsoft Teams
+  - name: PagerDuty
+  - name: Opsgenie
+  - name: ServiceNow
+  - name: FireHydrant
+  - name: GitHub
+  - name: GitLab
+  - name: Azure DevOps
+  - name: Snowflake Cortex Agents
+  - name: OpenTelemetry
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
+x-enrichment:
+  date: '2026-08-29'
+  status: enriched
+  artifacts_added: 39
+  pass: local-v1

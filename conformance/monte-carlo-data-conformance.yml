@@ -1,0 +1,164 @@
+generated: '2026-08-29'
+method: probed
+source: >-
+  live probes of auth.getmontecarlo.com, mcp.getmontecarlo.com,
+  www.montecarlodata.com and integrations.getmontecarlo.com, plus
+  docs.getmontecarlo.com (api-authentication, mcp-server, push-ingest-api,
+  webhooks, ai-security) and https://trust.montecarlo.ai/
+provider: Monte Carlo
+providerId: monte-carlo-data
+note: >-
+  Only conformance that could be evidenced from a fetched document or a live
+  response is recorded. Monte Carlo publishes no OpenAPI, no AsyncAPI and no
+  GraphQL SDL, so several rows are recorded as conforms:false with the reason,
+  rather than being omitted.
+standards:
+  - id: oauth2
+    name: OAuth 2.0 / 2.1
+    conforms: true
+    evidence: >-
+      Two live flows. Client-credentials for the GraphQL API/SDK/CLI documented
+      at docs.getmontecarlo.com/docs/api-authentication; OAuth 2.1
+      authorization-code + PKCE (S256) for the MCP server, confirmed by
+      https://auth.getmontecarlo.com/.well-known/oauth-authorization-server
+      (HTTP 200).
+  - id: rfc8414
+    name: OAuth 2.0 Authorization Server Metadata
+    conforms: true
+    evidence: >-
+      https://auth.getmontecarlo.com/.well-known/oauth-authorization-server
+      returns 200 with issuer, authorization_endpoint, token_endpoint,
+      jwks_uri, registration_endpoint, introspection_endpoint,
+      device_authorization_endpoint, code_challenge_methods_supported [S256].
+  - id: rfc9728
+    name: OAuth 2.0 Protected Resource Metadata
+    conforms: true
+    evidence: >-
+      https://mcp.getmontecarlo.com/.well-known/oauth-protected-resource/mcp
+      returns 200 with resource, authorization_servers, scopes_supported,
+      bearer_methods_supported. The 401 from POST /mcp carries a conformant
+      WWW-Authenticate Bearer challenge naming resource_metadata and scope.
+  - id: rfc7591
+    name: OAuth 2.0 Dynamic Client Registration
+    conforms: true
+    evidence: >-
+      registration_endpoint https://auth.getmontecarlo.com/oauth2/register is
+      advertised in the authorization-server metadata, and the MCP docs state
+      clients self-register via DCR with no client ID or secret to copy.
+  - id: rfc8628
+    name: OAuth 2.0 Device Authorization Grant
+    conforms: true
+    evidence: >-
+      device_authorization_endpoint and the
+      urn:ietf:params:oauth:grant-type:device_code grant type are both listed
+      in the live authorization-server metadata.
+  - id: oidc
+    name: OpenID Connect Discovery 1.0
+    conforms: true
+    evidence: >-
+      https://auth.getmontecarlo.com/.well-known/openid-configuration returns
+      200 with issuer, userinfo_endpoint, id_token_signing_alg_values_supported
+      [RS256], subject_types_supported [public], scopes_supported
+      [email, offline_access, openid, profile].
+  - id: rfc9116
+    name: security.txt
+    conforms: true
+    evidence: >-
+      https://www.montecarlodata.com/.well-known/security.txt returns 200 with
+      Contact, Expires (2030-01-01), Acknowledgments, Preferred-Languages,
+      Canonical, Hiring, Encryption (openpgp4fpr) and a Policy URL.
+  - id: rfc9727
+    name: 'api-catalog: a well-known URI for API discovery'
+    conforms: true
+    evidence: >-
+      https://www.montecarlodata.com/.well-known/api-catalog returns 200 with a
+      linkset[] anchored on https://api.getmontecarlo.com/ carrying service-doc,
+      service-desc and status links. This is a rare, deliberately published
+      discovery surface.
+  - id: mcp
+    name: Model Context Protocol
+    conforms: true
+    version: HTTP transport (streamable HTTP) with OAuth 2.1
+    evidence: >-
+      Live endpoint https://mcp.getmontecarlo.com/mcp answers a JSON-RPC
+      tools/list POST with a conformant 401 + RFC 9728 challenge. The server
+      publishes both tools and MCP prompts, and is an Anthropic-verified
+      connector in the Claude Connectors Directory.
+  - id: graphql
+    name: GraphQL
+    conforms: true
+    evidence: >-
+      The entire Monte Carlo API is a single GraphQL endpoint at
+      https://api.getmontecarlo.com/graphql, with a GraphiQL API Explorer at
+      https://getmontecarlo.com/graphiql and a generated reference at
+      https://apidocs.getmontecarlo.com/. Introspection is auth-gated — an
+      unauthenticated POST of {__schema{queryType{name}}} returns HTTP 401
+      {"message":"Unauthorized"}, so no SDL could be captured.
+  - id: opentelemetry
+    name: OpenTelemetry / OTLP (GenAI semantic conventions)
+    conforms: true
+    domain_standard: true
+    market: observability
+    evidence: >-
+      Monte Carlo's Agent Observability ingests OpenTelemetry GenAI traces. It
+      publishes a first-party OTel SDK (pypi.org/project/montecarlo-opentelemetry),
+      an OpenTelemetry Collector deployment as Terraform modules
+      (github.com/monte-carlo-data/terraform-aws-otel-collector,
+      terraform-google-otel-collector) and a fork of
+      opentelemetry-collector-contrib; the Google ADK integration doc states
+      agents "emit OpenTelemetry GenAI traces". OpenTelemetry is also a named
+      scope in Monte Carlo's Network Access Control surface list, i.e. it is a
+      first-class ingress protocol for the product, not just internal telemetry.
+    note: >-
+      This is the domain-standard signature for the observability market: a
+      buyer already emitting OTLP integrates without a bespoke connector.
+  - id: rfc9457
+    name: Problem Details for HTTP APIs
+    conforms: false
+    evidence: >-
+      The Push Ingest API returns a custom envelope, observed live on
+      2026-08-29: POST https://integrations.getmontecarlo.com/ingest/v1/metadata
+      with an empty body returned HTTP 400
+      {"error": "...", "details": {"<field>": ["required field"]}} with
+      Content-Type application/json, not application/problem+json.
+  - id: openapi
+    name: OpenAPI
+    conforms: false
+    evidence: >-
+      No OpenAPI or Swagger document is published. Probed /openapi.json,
+      /openapi.yaml, /swagger.json, /v1/openapi.json, /api-docs, /docs and
+      /redoc against api.getmontecarlo.com and integrations.getmontecarlo.com
+      (all 403 from the edge) and docs.getmontecarlo.com (404). The REST
+      surface — the three Push Ingest endpoints — is documented in prose and
+      JSON-schema-shaped tables only.
+  - id: asyncapi
+    name: AsyncAPI
+    conforms: false
+    evidence: >-
+      An event surface exists (outbound alert webhooks with an HMAC-SHA-512
+      signature and eight documented event types) but no AsyncAPI document is
+      published. See asyncapi/monte-carlo-data-webhooks.yml.
+  - id: idempotency
+    name: Idempotency keys
+    conforms: false
+    evidence: >-
+      No Idempotency-Key header or equivalent is documented on any surface. The
+      Push Ingest API is fire-and-forget (202 + invocation_id) and duplicate
+      protection is not described. Repeat pushes of the same asset are
+      upserts by natural key rather than being idempotency-key protected.
+  - id: pagination
+    name: Pagination
+    conforms: partial
+    evidence: >-
+      The GraphQL API uses Relay-style connection arguments (first/after) in the
+      documented queries, but no pagination contract is published for the REST
+      Push Ingest endpoints, which are write-only. Batch size is capped by
+      payload rather than by a page cursor (~500 events, 1 MB compressed).
+  - id: soc2
+    name: SOC 2
+    conforms: true
+    evidence: 'Named certification on the trust center at https://trust.montecarlo.ai/ (HTTP 200).'
+  - id: iso27001
+    name: ISO/IEC 27001
+    conforms: true
+    evidence: 'Named certification on the trust center at https://trust.montecarlo.ai/ (HTTP 200).'

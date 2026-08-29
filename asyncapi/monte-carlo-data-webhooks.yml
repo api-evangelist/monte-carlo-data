@@ -1,0 +1,93 @@
+generated: '2026-08-29'
+method: searched
+source: https://docs.getmontecarlo.com/docs/webhooks
+docs: https://docs.getmontecarlo.com/docs/webhooks
+provider: Monte Carlo
+providerId: monte-carlo-data
+asyncapi_published: false
+note: >-
+  Monte Carlo has a real outbound event surface but publishes no AsyncAPI
+  document. This is the webhook catalog captured from the provider's own
+  webhooks documentation, including the signed-delivery contract and the
+  payload state matrix. Nothing here is inferred.
+delivery:
+  transport: HTTPS POST
+  content_type: application/json
+  setup: 'https://getmontecarlo.com/settings/notifications — Create audience, Channel: Webhook'
+  signature:
+    optional: true
+    algorithm: HMAC-SHA-512
+    header: x-mcd-signature
+    secret: customer-supplied shared secret set at audience creation
+    verification_note: >-
+      Monte Carlo's reference implementation urlencodes the JSON body before
+      computing the HMAC and compares with hmac.compare_digest.
+  source_ips:
+    allowlisting_supported: true
+    where: 'https://getmontecarlo.com/account-info#networking (External webhook public IP addresses)'
+    note: All listed IPs must be allowlisted; any one of them may originate a request.
+  retries: not documented
+  ordering: not documented
+events:
+  - name: alert.created
+    label: Alert is created
+    fields:
+      alert_feedback: null
+      declared_alert_severity: null
+      owner: not included in payload
+  - name: alert.acknowledged
+    label: Alert is acknowledged
+    fields:
+      alert_feedback: investigating
+  - name: alert.status_updated
+    label: Alert status is updated
+    fields:
+      alert_feedback: >-
+        one of investigating, no_status, work_in_progress, fixed, expected,
+        no_action_needed, false_positive
+  - name: alert.owner_changed
+    label: Alert owner is changed
+    fields:
+      owner: email of assigned owner
+  - name: alert.external_ticket_attached
+    label: External ticket is attached to an alert (Jira, ServiceNow, etc.)
+  - name: alert.marked_incident
+    label: Alert is marked as incident
+    fields:
+      alert_feedback: investigating (only when current value is null or no_status)
+      declared_alert_severity: SEV-1, SEV-2, SEV-3 or SEV-4
+  - name: alert.unmarked_incident
+    label: Alert is unmarked as incident
+    fields:
+      declared_alert_severity: null
+  - name: alert.resolved
+    label: Alert is resolved
+    fields:
+      alert_feedback: one of fixed, expected, no_action_needed, false_positive
+event_count: 8
+payload_envelope:
+  members:
+    - account.id
+    - action
+    - payload.event_list[]
+  note: >-
+    Payload examples are published in the docs (rule breach shown with
+    event_list[].data.hits[] carrying measurement_timestamp, value and
+    metric_display_name).
+other_event_channels:
+  - Slack
+  - Microsoft Teams
+  - Google Chat
+  - PagerDuty
+  - Opsgenie
+  - ServiceNow
+  - FireHydrant
+  - Jira
+streaming_ingest:
+  protocol: OpenTelemetry / OTLP
+  direction: inbound to Monte Carlo
+  note: >-
+    Agent Observability ingests OTLP GenAI traces via a Monte Carlo-deployed
+    OpenTelemetry Collector; OpenTelemetry is a named scope in Network Access
+    Control. This is an event surface, but an ingest one, and it is governed by
+    the OpenTelemetry spec rather than by an AsyncAPI document.

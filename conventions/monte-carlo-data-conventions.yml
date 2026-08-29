@@ -1,0 +1,181 @@
+generated: '2026-08-29'
+method: searched
+source: >-
+  https://docs.getmontecarlo.com/docs/api,
+  https://docs.getmontecarlo.com/docs/api-authentication,
+  https://docs.getmontecarlo.com/docs/push-ingest-api,
+  https://docs.getmontecarlo.com/docs/webhooks,
+  https://docs.getmontecarlo.com/docs/mcp-server,
+  and the provider's own Agent Skills at
+  https://github.com/monte-carlo-data/mc-agent-toolkit (Apache-2.0)
+provider: Monte Carlo
+providerId: monte-carlo-data
+surfaces:
+  - name: GraphQL API
+    base: https://api.getmontecarlo.com/graphql
+    style: GraphQL (single endpoint, queries + mutations)
+    explorer: https://getmontecarlo.com/graphiql
+    reference: https://apidocs.getmontecarlo.com/
+  - name: Push Ingest API
+    base: https://integrations.getmontecarlo.com
+    style: REST (3 write-only POST endpoints)
+    maturity: public preview
+    plan_gate: Enterprise or higher
+  - name: MCP server
+    base: https://mcp.getmontecarlo.com/mcp
+    style: JSON-RPC over streamable HTTP
+  - name: Outbound webhooks
+    style: POST application/json to a customer endpoint, optional HMAC-SHA-512 signature
+auth_style:
+  primary: 'header key pair (x-mcd-id + x-mcd-token)'
+  alternative: 'OAuth 2.0 client credentials -> Authorization: Bearer <JWT>'
+  mcp: OAuth 2.1 + DCR, or MCP-scoped key pair
+  detail: authentication/monte-carlo-data-authentication.yml
+  note: >-
+    Credentials are surface-specific and non-transferable: a standard API key
+    is rejected by both the MCP server and the Push Ingest API, each of which
+    requires its own key type (MCP server key / Ingestion-scoped integration
+    key). This is unusual and is the single most common integration mistake the
+    docs warn about.
+idempotency:
+  supported: false
+  header: null
+  note: >-
+    No Idempotency-Key header or request-replay contract is documented on any
+    surface. The Push Ingest API is fire-and-forget (202 + invocation_id) with
+    no documented duplicate suppression. Partial mitigation only: the
+    create_or_update_* monitor tools and mutations are upserts keyed on the
+    monitor's name/namespace, so re-running one converges rather than
+    duplicating; the docs do not describe this as an idempotency guarantee.
+pagination:
+  style: relay-connection (GraphQL)
+  params:
+    - first
+    - after
+  note: >-
+    REST Push Ingest endpoints are write-only and have no pagination. Batch
+    size is bounded by payload, not by cursor.
+batching:
+  recommended_events_per_request: 500
+  max_compressed_body: 1MB
+  exceeded_status: 413
+  max_mcons_per_delete: 1000
+request_tracing:
+  field: invocation_id
+  where: 202 response body of every Push Ingest call
+  note: >-
+    The invocation_id is the documented handle for tracing a push through
+    Monte Carlo's downstream systems; support asks for it by name. There is no
+    documented X-Request-Id / traceparent header on the GraphQL surface.
+  telemetry: >-
+    Monte Carlo consumes W3C-traced OpenTelemetry GenAI spans for Agent
+    Observability, so trace context flows INTO the platform even though it is
+    not surfaced as a response header on the API.
+versioning:
+  api: unversioned GraphQL endpoint; /ingest/v1/ on the REST surface
+  detail: lifecycle/monte-carlo-data-lifecycle.yml
+error_envelope:
+  shape: '{"error": "<message>", "details": {"<field>": ["<msg>"]}}'
+  rfc9457: false
+  detail: errors/monte-carlo-data-problem-types.yml
+rate_limit_signaling:
+  headers_published: false
+  detail: rate-limits/monte-carlo-data-rate-limits.yml
+  note: >-
+    No X-RateLimit-* / RateLimit-* / Retry-After contract is published. The
+    only published quantitative ceilings are payload and batch sizes and a
+    "push freshness and volume once per hour" cadence rule.
+dry_run_mode:
+  supported: true
+  grade: verified
+  mechanisms:
+    - surface: MCP server
+      parameter: 'dry_run=True'
+      applies_to:
+        - create_or_update_metric_monitor
+        - create_or_update_sql_monitor
+        - create_or_update_validation_monitor
+        - create_or_update_table_monitor
+        - create_or_update_comparison_monitor
+      effect: >-
+        Returns the authored monitor definition (the YAML block) without
+        deploying it, so an agent can compose and review a Monitors-as-Code
+        file before anything is applied.
+      source: https://github.com/monte-carlo-data/mc-agent-toolkit/blob/main/skills/manage-mac/SKILL.md
+    - surface: CLI
+      command: montecarlo monitors compile --namespace <namespace>
+      effect: Validates a Monitors-as-Code file without deploying; `apply` is the separate deploy step.
+    - surface: MC Prevent
+      command: /mc-validate
+      effect: >-
+        Runs change-impact assessment before a dbt/SQL model edit and generates
+        SQL validation queries after it, executed on demand.
+  note: >-
+    This is a genuinely strong agent-safety property: the write tools an agent
+    reaches for first ship a first-class rehearsal mode, named and documented by
+    the provider.
+reversibility:
+  grade: documented
+  read_only: false
+  note: >-
+    Monte Carlo's write surface is configuration and workflow state — monitors,
+    alerts, credentials, pushed metadata — not money or irreversible side
+    effects. Reversal paths exist and are documented for every write family
+    below, but NO time window is published for any of them, so this grades
+    `documented` rather than `verified`. No window is asserted here that the
+    docs do not state.
+  operations:
+    - write: create a monitor (create_or_update_*_monitor / monitors apply)
+      reversal: >-
+        Re-apply with a corrected definition (the operation is an upsert), or
+        delete the monitor. For MaC-managed monitors the YAML file is the source
+        of truth and the next `montecarlo monitors apply` overwrites any
+        API-side change.
+      window: not stated
+      source: https://github.com/monte-carlo-data/mc-agent-toolkit/blob/main/skills/manage-mac/SKILL.md
+    - write: mark an alert as an incident
+      reversal: unmark as incident (a documented, webhook-emitting state transition)
+      window: not stated
+      source: https://docs.getmontecarlo.com/docs/webhooks
+    - write: resolve an alert
+      reversal: >-
+        Re-open by status transition; the next breach after resolution opens a
+        fresh alert rather than reusing the resolved one.
+      window: not stated
+      source: https://docs.getmontecarlo.com/changelog/alert-grouping-by-status
+    - write: create an API key / MCP key / OAuth client
+      reversal: one-click revoke, or Revoke all, from the credentials tab
+      window: >-
+        not stated for revocation; separately, personal keys, MCP keys and
+        personal OAuth clients are capped at a maximum 1-year expiry
+      source: https://docs.getmontecarlo.com/changelog/oauth-20-support-for-the-api-sdk-and-cli
+    - write: push table metadata via /ingest/v1/metadata
+      reversal: >-
+        deletePushIngestedTables GraphQL mutation (max 1,000 MCONs per call),
+        which also removes the associated lineage nodes.
+      window: >-
+        not stated. Monte Carlo notes push-ingested tables are NEVER removed by
+        its periodic cleanup — they are customer-managed, so the reversal is
+        the customer's responsibility and there is no expiry.
+      source: https://docs.getmontecarlo.com/docs/push-ingest-api#push-table-deletion
+    - write: enable or edit SSO
+      reversal: >-
+        redeem a single-use recovery code at the sign-in page to trigger a
+        password reset; editing a live SSO config also opens a grace window in
+        which password login stays available for that admin only.
+      window: >-
+        grace window documented but its length is not published; recovery codes
+        are single-use and have no stated expiry.
+      source: https://docs.getmontecarlo.com/docs/sso-recovery-codes
+  agent_guardrails: >-
+    Monte Carlo's own remediation Agent Skill instructs agents to NEVER modify
+    data directly (DELETE/UPDATE/DROP) without explicit user confirmation AND a
+    clearly stated rollback plan, and to include a "Rollback:" section in every
+    remediation proposal. That is a provider-authored reversibility discipline,
+    not one we inferred.
+cross_links:
+  authentication: authentication/monte-carlo-data-authentication.yml
+  errors: errors/monte-carlo-data-problem-types.yml
+  lifecycle: lifecycle/monte-carlo-data-lifecycle.yml
+  rate_limits: rate-limits/monte-carlo-data-rate-limits.yml
+  scopes: scopes/monte-carlo-data-scopes.yml

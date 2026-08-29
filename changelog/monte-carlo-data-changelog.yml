@@ -1,0 +1,86 @@
+generated: '2026-08-29'
+method: searched
+source: https://docs.getmontecarlo.com/changelog
+docs: https://docs.getmontecarlo.com/changelog
+provider: Monte Carlo
+providerId: monte-carlo-data
+scheme: continuous-deployment product changelog (no release version numbers)
+current_version: null
+dated: false
+note: >-
+  Monte Carlo publishes a product changelog on its docs site and each entry is
+  independently fetchable as markdown (append .md to the entry URL). Entries
+  carry no version number and no publication date in the markdown body, so the
+  ordering below is the order the changelog itself lists them, newest first, and
+  no date is asserted. Client-library versions ARE dated and versioned — see
+  packages/monte-carlo-data-packages.yml. Note also a second, separate change
+  log referenced from the lifecycle page at
+  https://docs.getmontecarlo.com/docs/change-log.
+entries:
+  - title: Monte Carlo AI is now a full data helpdesk in Slack
+    url: https://docs.getmontecarlo.com/changelog/monte-carlo-ai-is-now-a-full-data-helpdesk-in-slack
+    type: addition
+    breaking: false
+    highlight: >-
+      @-mention the Monte Carlo Slack app with any data question, not just ones
+      tied to an existing alert; it traces lineage, checks freshness and walks
+      history in-thread.
+  - title: Automatic Triage is now enabled by default
+    url: https://docs.getmontecarlo.com/changelog/automatic-triage-is-now-enabled-for-all-accounts
+    type: behavior-change
+    breaking: false
+    highlight: >-
+      The triage agent now runs automatically on every new alert. Usage-based
+      pricing applies from 2026-09-01 with the first 20 triaged alerts free per
+      account per month; accounts can set an off/unrestricted/custom monthly cap.
+    commercial_impact: true
+  - title: Oracle thick mode support
+    url: https://docs.getmontecarlo.com/changelog/oracle-thick-mode-support
+    type: addition
+    breaking: false
+    highlight: Oracle thick-mode connectivity plus SSL support for Oracle, DB2 and MySQL, configurable in the UI.
+  - title: Network Access Controls are now manageable in the UI
+    url: https://docs.getmontecarlo.com/changelog/network-access-controls-are-now-manageable-in-the-ui
+    type: addition
+    breaking: false
+    highlight: >-
+      IP/CIDR allowlists manageable in-product, scoped across MCP, API,
+      Ingestion, UI, Agent and OpenTelemetry surfaces.
+  - title: SSO Lockout Recovery
+    url: https://docs.getmontecarlo.com/changelog/sso-lockout-recovery
+    type: addition
+    breaking: false
+    highlight: >-
+      Single-use recovery codes generated as a required step of saving an SSO
+      config, redeemable at sign-in; editing a live SSO config opens a grace
+      window for the editing admin.
+  - title: Domain filter on the Alerts page
+    url: https://docs.getmontecarlo.com/changelog/domain-filter-on-the-alerts-page
+    type: addition
+    breaking: false
+  - title: Trigger-based monitor schedules can now run trigger-only
+    url: https://docs.getmontecarlo.com/changelog/trigger-based-monitor-schedules-can-now-run-trigger-only
+    type: addition
+    breaking: false
+    highlight: >-
+      The fallback periodic run on dynamic schedules is now optional (UI, API,
+      and monitors-as-code via interval_minutes 0).
+    api_visible: true
+  - title: Automatic Conversation Clustering for Snowflake Cortex and Databricks Genie agents
+    url: https://docs.getmontecarlo.com/changelog/automatic-conversation-clustering-now-available-for-snowflake-cortex-and-databricks-genie-agents
+    type: addition
+    breaking: false
+  - title: OAuth 2.0 Support for the API, SDK, and CLI
+    url: https://docs.getmontecarlo.com/changelog/oauth-20-support-for-the-api-sdk-and-cli
+    type: addition
+    breaking: false
+    api_visible: true
+    highlight: >-
+      Client-credentials M2M auth end to end across API, SDK and CLI; personal
+      and service OAuth clients; two secrets per client for zero-downtime
+      rotation; maximum expiry capped at one year for personal keys, MCP keys
+      and personal OAuth clients.
+  - title: Alert grouping by status
+    url: https://docs.getmontecarlo.com/changelog/alert-grouping-by-status
+    type: addition
+    breaking: false

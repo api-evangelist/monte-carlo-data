@@ -1,0 +1,66 @@
+generated: '2026-08-29'
+method: derived
+source: >-
+  derived from mcp/monte-carlo-data-mcp.yml (tool names published by Monte Carlo)
+  and https://docs.getmontecarlo.com/docs/push-ingest-api (the only public REST
+  operations). No OpenAPI and no GraphQL SDL are published, so no operationId
+  binding is possible.
+provider: Monte Carlo
+providerId: monte-carlo-data
+note: >-
+  This crosswalk records the DIVERGENCE between Monte Carlo's three surfaces
+  rather than a tool-to-operationId map, because the map cannot be built
+  honestly here: there is no OpenAPI to bind to, and GraphQL introspection is
+  auth-gated (HTTP 401). Every MCP tool is therefore mcp_only[] with respect to
+  any PUBLIC contract — not because no backing operation exists, but because
+  Monte Carlo publishes none that a third party can read. Recording that as
+  coverage 0 would be misleading; recording it as unknown is the honest state.
+surfaces:
+  openapi:
+    published: false
+    note: probed 7 conventional paths on 2 API hosts and the docs host — none served a spec
+  graphql:
+    endpoint: https://api.getmontecarlo.com/graphql
+    gated: true
+    introspection_status: 401
+    reference: https://apidocs.getmontecarlo.com/
+    note: >-
+      A generated HTML reference is public (23 MB single page) but no SDL or
+      introspection JSON is downloadable.
+  rest:
+    base: https://integrations.getmontecarlo.com
+    operations:
+      - POST /ingest/v1/metadata
+      - POST /ingest/v1/lineage
+      - POST /ingest/v1/querylogs
+    spec: none
+  mcp:
+    endpoint: https://mcp.getmontecarlo.com/mcp
+    gated: true
+    tools_list_status: 401
+    tool_count: 56
+crosswalk: []
+mcp_only:
+  - tool: all 56 published MCP tools
+    reason: >-
+      No public machine-readable contract exists to bind them to. The tools are
+      backed by Monte Carlo's GraphQL API (stated in the MCP technical overview)
+      but the schema is auth-gated, so no operationId can be cited.
+rest_only:
+  - operation: POST /ingest/v1/metadata
+    reason: >-
+      Push ingest of table/view schema, columns, volume and freshness. No MCP
+      tool exposes it; the documented agent path to this endpoint is the
+      push-ingestion Agent Skill generating a script, not a tool call.
+  - operation: POST /ingest/v1/lineage
+    reason: Push ingest of table- and column-level lineage. No corresponding MCP tool.
+  - operation: POST /ingest/v1/querylogs
+    reason: Push ingest of SQL query history. No corresponding MCP tool.
+coverage:
+  mcp_tools: 56
+  rest_operations: 3
+  bound: 0
+  mcp_only: 56
+  rest_only: 3
+  confidence: low
+  reason: both introspectable schemas are auth-gated

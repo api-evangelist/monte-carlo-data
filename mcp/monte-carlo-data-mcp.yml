@@ -1,0 +1,291 @@
+generated: '2026-08-29'
+method: searched
+status: published
+source: >-
+  https://docs.getmontecarlo.com/docs/mcp-server,
+  https://docs.getmontecarlo.com/docs/mcp-server-reference-and-operations,
+  https://docs.getmontecarlo.com/docs/monte-carlo-mcp-server-technical-overview
+provider: Monte Carlo
+providerId: monte-carlo-data
+name: Monte Carlo MCP Server
+description: >-
+  A first-party, fully hosted Model Context Protocol server that exposes Monte
+  Carlo's data + AI observability platform to agents — alerts, monitors,
+  assets, lineage, query and job performance, and AI agent traces. Runs on AWS
+  Lambda behind an integration gateway that authenticates every request and
+  forwards it to Monte Carlo's GraphQL API, executing under the calling user's
+  identity so existing RBAC applies. Stateless: no customer data is persisted
+  or cached by the server.
+deployment:
+  mode: remote
+  endpoint: https://mcp.getmontecarlo.com/mcp
+  auth: oauth
+  verified: probed
+  probe:
+    method: POST tools/list
+    url: https://mcp.getmontecarlo.com/mcp
+    http_status: 401
+    www_authenticate: >-
+      Bearer error="invalid_token", error_description="Authentication required",
+      resource_metadata="https://mcp.getmontecarlo.com/.well-known/oauth-protected-resource/mcp",
+      scope="offline_access"
+    date: '2026-08-29'
+    note: >-
+      A conformant RFC 9728 challenge. The endpoint is live and reachable; the
+      live tool schemas are auth-gated, so the tools[] below are the names Monte
+      Carlo itself publishes in its docs and in its own open-source Agent
+      Skills, NOT an introspected tools/list response. inputSchema for each tool
+      requires an authenticated introspection we deliberately did not attempt.
+    install_note: >-
+      mode is `remote`, not `both`. Monte Carlo publishes no stdio MCP package
+      of its own — the key-based path in the docs runs the THIRD-PARTY
+      `npx -y mcp-remote https://mcp.getmontecarlo.com/mcp` bridge against the
+      same hosted endpoint, so it is a client shim for the remote server rather
+      than a Monte Carlo stdio server.
+transport: streamable-http
+protocol: MCP (HTTP transport, OAuth 2.1)
+authentication:
+  - method: oauth2.1-dynamic-client-registration
+    preferred: true
+    note: >-
+      Clients self-register via DCR (RFC 7591) at
+      https://auth.getmontecarlo.com/oauth2/register — there is no static client
+      ID or secret to create. Scope offline_access. Requires an Editor role or
+      above in Monte Carlo.
+    authorization_server: https://auth.getmontecarlo.com
+    protected_resource_metadata: https://mcp.getmontecarlo.com/.well-known/oauth-protected-resource/mcp
+  - method: verified-connector
+    note: >-
+      Monte Carlo ships as an Anthropic-verified connector in the Claude
+      Connectors Directory (https://claude.com/connectors/monte-carlo) — no keys
+      to manage.
+  - method: mcp-server-key
+    note: >-
+      Scoped MCP-server-only credentials (key id + secret) for service accounts
+      and CI, sent as `Authorization: Bearer <KEY_ID>:<KEY_SECRET>` or as
+      x-mcd-id / x-mcd-token headers. Standard Monte Carlo API keys do NOT work
+      against the MCP server. Created via UI, `montecarlo mcp create-key`, or
+      the createMcpIntegrationKey GraphQL mutation.
+clients_documented:
+  - Claude / Claude Desktop (verified connector)
+  - Claude Code (claude mcp add --transport http monte-carlo-mcp https://mcp.getmontecarlo.com/mcp)
+  - Cursor
+  - VS Code
+  - Snowflake Cortex Agents (CREATE EXTERNAL MCP SERVER, OAUTH_DYNAMIC_CLIENT)
+toolsets:
+  - name: default
+    always_on: true
+    description: Alerts, monitors, assets, lineage, data operations, utility tools.
+  - name: extended
+    header: 'x-mcd-toolset: extended'
+    description: Adds use-case and dashboard-widget tools.
+  - name: agent_observability
+    header: 'x-mcd-toolset: agent_observability'
+    description: Adds AI agent inspection tools (metadata, conversations, traces).
+prompts:
+  published: true
+  capability: MCP prompts
+  note: >-
+    The server publishes curated workflow prompts over the MCP prompts
+    capability; supported clients discover them on connect and surface them as
+    /mcp__<server>__<prompt>.
+  items:
+    - name: mc-asset-health
+      description: Check the current health of a table before querying it.
+    - name: mc-triage
+      description: Triage Monte Carlo alerts so you know where to focus.
+    - name: mc-incident-response
+      description: Full incident orchestration — triage through root cause to remediation.
+    - name: mc-proactive-monitoring
+      description: Discover coverage gaps and create monitors to close them.
+tools_source: >-
+  Tool names are taken verbatim from Monte Carlo's own documentation
+  (docs.getmontecarlo.com/docs/mcp-server) and from the 19 Apache-2.0 Agent
+  Skills the company publishes at
+  https://github.com/monte-carlo-data/mc-agent-toolkit, which call these tools
+  by name. Input schemas are NOT recorded because the live tools/list is
+  auth-gated (401).
+tool_count: 56
+tools:
+  - name: create_llm_span
+    toolset: agent_observability
+    kind: write
+  - name: create_or_update_agent_evaluation_monitor
+    toolset: agent_observability
+    kind: write
+  - name: create_or_update_agent_metric_monitor
+    toolset: agent_observability
+    kind: write
+  - name: create_or_update_agent_trajectory_monitor
+    toolset: agent_observability
+    kind: write
+  - name: create_or_update_agent_validation_monitor
+    toolset: agent_observability
+    kind: write
+  - name: create_or_update_alert_comment
+    toolset: default
+    kind: write
+  - name: create_or_update_comparison_monitor
+    toolset: default
+    kind: write
+  - name: create_or_update_data_product
+    toolset: default
+    kind: write
+  - name: create_or_update_metric_monitor
+    toolset: default
+    kind: write
+  - name: create_or_update_sql_monitor
+    toolset: default
+    kind: write
+  - name: create_or_update_table_monitor
+    toolset: default
+    kind: write
+  - name: create_or_update_table_monitor_asset_rule
+    toolset: default
+    kind: write
+  - name: create_or_update_validation_monitor
+    toolset: default
+    kind: write
+  - name: get_agent_conversation
+    toolset: agent_observability
+    kind: read
+  - name: get_agent_conversations
+    toolset: agent_observability
+    kind: read
+  - name: get_agent_metadata
+    toolset: agent_observability
+    kind: read
+  - name: get_agent_segments
+    toolset: agent_observability
+    kind: read
+  - name: get_agent_trace
+    toolset: agent_observability
+    kind: read
+  - name: get_agent_traces
+    toolset: agent_observability
+    kind: read
+  - name: get_alert_agent_classification
+    toolset: default
+    kind: read
+  - name: get_alerts
+    toolset: default
+    kind: read
+  - name: get_asset_lineage
+    toolset: default
+    kind: read
+  - name: get_audiences
+    toolset: default
+    kind: read
+  - name: get_change_timeline
+    toolset: default
+    kind: read
+  - name: get_domains
+    toolset: default
+    kind: read
+  - name: get_etl_issues
+    toolset: default
+    kind: read
+  - name: get_etl_jobs
+    toolset: default
+    kind: read
+  - name: get_field_lineage
+    toolset: default
+    kind: read
+  - name: get_field_metric_definitions
+    toolset: default
+    kind: read
+  - name: get_github_prs
+    toolset: default
+    kind: read
+  - name: get_jobs_performance
+    toolset: default
+    kind: read
+  - name: get_mc_webapp_url
+    toolset: default
+    kind: read
+  - name: get_monitor_report
+    toolset: default
+    kind: read
+  - name: get_monitors
+    toolset: default
+    kind: read
+  - name: get_queries_for_table
+    toolset: default
+    kind: read
+  - name: get_query_changes
+    toolset: default
+    kind: read
+  - name: get_query_latency_distribution
+    toolset: default
+    kind: read
+  - name: get_query_rca
+    toolset: default
+    kind: read
+  - name: get_reinforcement_loop_report
+    toolset: default
+    kind: read
+  - name: get_reinforcement_loop_summaries
+    toolset: default
+    kind: read
+  - name: get_table
+    toolset: default
+    kind: read
+  - name: get_table_freshness
+    toolset: default
+    kind: read
+  - name: get_table_size_history
+    toolset: default
+    kind: read
+  - name: get_tables_for_job
+    toolset: default
+    kind: read
+  - name: get_tasks_performance
+    toolset: default
+    kind: read
+  - name: get_top_slow_queries
+    toolset: default
+    kind: read
+  - name: get_troubleshooting_agent_results
+    toolset: default
+    kind: read
+  - name: get_unmonitored_tables_with_anomalies
+    toolset: default
+    kind: read
+  - name: get_use_case_table_summary
+    toolset: extended
+    kind: read
+  - name: get_use_case_tables
+    toolset: extended
+    kind: read
+  - name: get_use_cases
+    toolset: extended
+    kind: read
+  - name: get_validation_predicates
+    toolset: default
+    kind: read
+  - name: get_warehouses
+    toolset: default
+    kind: read
+  - name: run_troubleshooting_agent
+    toolset: default
+    kind: write
+  - name: search
+    toolset: default
+    kind: read
+  - name: update_alert
+    toolset: default
+    kind: write
+network_access_control:
+  supported: true
+  docs: https://docs.getmontecarlo.com/docs/network-access-control
+  note: >-
+    IP/CIDR allowlists can be scoped to the MCP surface specifically (scopes
+    cover MCP, API, Ingestion, UI, Agent and OpenTelemetry).
+security:
+  token_passthrough: false
+  note: >-
+    Monte Carlo states the MCP server never reuses customer tokens directly,
+    avoiding the MCP token-passthrough anti-pattern; calls execute under the
+    authenticated user's identity in the GraphQL API. TLS 1.2+ in transit;
+    stateless, no caching of customer data.
+  docs: https://docs.getmontecarlo.com/docs/ai-security

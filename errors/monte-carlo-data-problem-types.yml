@@ -1,0 +1,92 @@
+generated: '2026-08-29'
+method: searched
+source: >-
+  https://docs.getmontecarlo.com/docs/push-ingest-api#error-codes,
+  https://docs.getmontecarlo.com/docs/mcp-server-reference-and-operations#troubleshooting,
+  https://docs.getmontecarlo.com/docs/troubleshooting-and-faqs-api,
+  plus a live unauthenticated POST to
+  https://integrations.getmontecarlo.com/ingest/v1/metadata on 2026-08-29
+provider: Monte Carlo
+providerId: monte-carlo-data
+format: custom-json
+rfc9457: false
+envelope:
+  content_type: application/json
+  shape: '{"error": "<message>", "details": {"<field>": ["<field-level error>"]}}'
+  observed:
+    url: https://integrations.getmontecarlo.com/ingest/v1/metadata
+    method: POST
+    body_sent: '{}'
+    http_status: 400
+    response: >-
+      {"error": "Invalid request body", "details": {"event_type": ["required field"],
+      "events": ["required field"], "resource": ["required field"]}}
+    date: '2026-08-29'
+  note: >-
+    Not RFC 9457 — no type/title/status/detail/instance members and no
+    application/problem+json media type. The `details` map is field-keyed with
+    an array of messages per field, which is machine-actionable but bespoke.
+success_envelope:
+  http_status: 202
+  shape: '{"invocation_id": "<uuid>"}'
+  note: >-
+    Every accepted Push Ingest request returns an invocation_id. Monte Carlo
+    support asks for it to trace a push, so it functions as the correlation id
+    for this surface.
+problem_types:
+  - status: 400
+    surface: Push Ingest API
+    title: Schema validation failed
+    remediation: >-
+      Read the field-level errors in `details` and correct the payload. Required
+      top-level members are event_type, resource and events.
+  - status: 401
+    surface: Push Ingest API
+    title: Authentication failed
+    remediation: Wrong integration key ID or secret; re-check x-mcd-id / x-mcd-token.
+  - status: 403
+    surface: Push Ingest API
+    title: Key not authorized for this resource
+    remediation: >-
+      The Ingestion key is not authorized for the resource.uuid in the payload.
+      Re-issue the key without warehouseIds, or with the correct warehouse UUID.
+  - status: 413
+    surface: Push Ingest API
+    title: Payload too large
+    detail: Compressed body exceeds 1 MB.
+    remediation: Split into smaller batches; Monte Carlo recommends ~500 events per request.
+  - status: 5xx
+    surface: Push Ingest API
+    title: Server error
+    remediation: Retry with exponential backoff.
+  - status: 401
+    surface: GraphQL API
+    title: Unauthorized
+    detail: 'Observed live: unauthenticated POST to /graphql returns {"message":"Unauthorized"}.'
+    remediation: Send x-mcd-id / x-mcd-token, or an OAuth bearer access token.
+  - status: 403
+    surface: 'api.getmontecarlo.com (edge)'
+    title: Forbidden
+    detail: >-
+      Observed live: any unauthenticated GET to api.getmontecarlo.com returns
+      {"message":"Forbidden"}. This is an edge policy, not an application error.
+  - status: 401
+    surface: MCP server
+    title: invalid_token / Authentication required
+    detail: >-
+      Observed live. Carries WWW-Authenticate: Bearer with resource_metadata and
+      scope="offline_access".
+    remediation: >-
+      Complete the OAuth 2.1 flow, or supply MCP-server-scoped keys. Standard
+      API keys are rejected here by design.
+  - status: 403
+    surface: MCP server
+    title: Invalid OAuth error response
+    detail: Documented as usually caused by an outdated MCP client that drops custom headers.
+    remediation: Upgrade the MCP client.
+  - status: 403
+    surface: Webhook receiver (customer side)
+    title: Signature verification failed
+    detail: >-
+      Monte Carlo's own reference Lambda returns 403 when the HMAC-SHA-512
+      x-mcd-signature does not match.

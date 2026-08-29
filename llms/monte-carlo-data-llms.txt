@@ -2,9 +2,12 @@
 
 > Data breaks. We ensure your team is the first to know and the first to solve.
 
+Append .md to any documentation page URL to get its markdown version.
+
 ## Guides
-- [Agent Monitors Overview](https://docs.getmontecarlo.com/docs/agent-monitors-overview.md): Agent Observability capabilities, instrumentation setup, and monitor types for tracking agent behavior.
+- [Agent Observability Overview](https://docs.getmontecarlo.com/docs/agent-monitors-overview.md): Agent Observability capabilities, instrumentation setup, and monitor types for tracking agent behavior.
 - [Trace and Conversation Structure](https://docs.getmontecarlo.com/docs/exploring-agent-traces.md): What a trace contains, how to read one, and how traces relate to conversations.
+- [Conversation Clusters](https://docs.getmontecarlo.com/docs/conversation-clustering.md)
 - [Agent Evaluation Monitors](https://docs.getmontecarlo.com/docs/agent-evaluation-monitors.md)
 - [Agent Metric Monitors](https://docs.getmontecarlo.com/docs/agent-metric-monitors.md)
 - [Agent Trajectory Monitors](https://docs.getmontecarlo.com/docs/agent-trajectory-monitors.md)
@@ -16,10 +19,11 @@
 - [Agent Bricks and custom agents](https://docs.getmontecarlo.com/docs/agent-bricks-and-custom-agents.md): Monitor Databricks Agent Bricks and Mosaic AI Agent Framework agents in Monte Carlo for full agent observability
 - [AI/BI Genie](https://docs.getmontecarlo.com/docs/databricks-ai-bi-genie.md): Monitor Databricks AI/BI Genie spaces in Monte Carlo for full agent observability
 - [Operations agent](https://docs.getmontecarlo.com/docs/operations-agent.md)
+- [Monitoring plan](https://docs.getmontecarlo.com/docs/monitoring-plan.md)
 - [Troubleshooting agent](https://docs.getmontecarlo.com/docs/troubleshooting-agent.md)
 - [Triage agent](https://docs.getmontecarlo.com/docs/triage-agent.md)
 - [Tuning agent](https://docs.getmontecarlo.com/docs/tuning-agent.md)
-- [Cost & Performance agent](https://docs.getmontecarlo.com/docs/cost-agent.md)
+- [Cost & Performance agent](https://docs.getmontecarlo.com/docs/cost-agent.md): Find and cut warehouse spend
 - [PR agent](https://docs.getmontecarlo.com/docs/pr-agent.md)
 - [PII / Compliance Agent](https://docs.getmontecarlo.com/docs/pii-detection.md): Warehouse-native PII discovery and monitoring for compliance and governance teams.
 - [MCP Server](https://docs.getmontecarlo.com/docs/mcp-server.md): How AI agents interact with Monte Carlo
@@ -124,7 +128,6 @@
 - [Presto](https://docs.getmontecarlo.com/docs/presto.md)
 - [Hive SQL](https://docs.getmontecarlo.com/docs/hive-sql.md)
 - [Spark](https://docs.getmontecarlo.com/docs/spark.md)
-- [Presto, Hive, & EMR: Query Logs](https://docs.getmontecarlo.com/docs/s3-events-query-logs.md)
 - [Troubleshooting & FAQ: Data Lakes](https://docs.getmontecarlo.com/docs/troubleshooting-faq-data-lakes.md)
 - [Creating IAM Roles](https://docs.getmontecarlo.com/docs/creating-iam-roles.md)
 - [Auto-generating IAM Policy Documents](https://docs.getmontecarlo.com/docs/auto-generating-iam-policies.md)
@@ -184,11 +187,13 @@
 - [GCP Dataform (Public Preview)](https://docs.getmontecarlo.com/docs/gcp-dataform.md)
 - [Snowflake Tasks (Public Preview)](https://docs.getmontecarlo.com/docs/snowflake-tasks.md)
 - [Real-Time Task Failure Notifications](https://docs.getmontecarlo.com/docs/real-time-task-failure-notifications.md)
+- [Power BI Dataflows (Public Preview)](https://docs.getmontecarlo.com/docs/power-bi-dataflows.md)
 - [GitHub](https://docs.getmontecarlo.com/docs/github.md): Integrate Monte Carlo with your Github to gain visibility into code impact on your data
 - [GitHub Enterprise Server (GHES) Integration](https://docs.getmontecarlo.com/docs/github-enterprise-server-ghes-integration.md): Integrate Monte Carlo with your self-hosted GitHub Enterprise Server instance to gain visibility into code impact on your data.
 - [GitLab (public preview)](https://docs.getmontecarlo.com/docs/gitlab.md): Integrate Monte Carlo with your GitLab to gain visibility into code impact on your data
-- [Azure DevOps (Public Preview)](https://docs.getmontecarlo.com/docs/azure-devops.md): Integrate Monte Carlo with Azure DevOps Repos to gain visibility into code impact on your data
-- [Azure DevOps Work Items (Public Preview)](https://docs.getmontecarlo.com/docs/azure-devops-work-items.md)
+- [Azure DevOps](https://docs.getmontecarlo.com/docs/azure-devops.md): Integrate Monte Carlo with Azure DevOps Repos to gain visibility into code impact on your data
+- [Bitbucket (public preview)](https://docs.getmontecarlo.com/docs/bitbucket.md): Integrate Monte Carlo with Bitbucket Cloud to gain visibility into code impact on your data
+- [Azure DevOps Work Items ](https://docs.getmontecarlo.com/docs/azure-devops-work-items.md)
 - [Datadog](https://docs.getmontecarlo.com/docs/datadog.md)
 - [FireHydrant](https://docs.getmontecarlo.com/docs/firehydrant.md): Integrate Monte Carlo with FireHydrant
 - [Google Chat](https://docs.getmontecarlo.com/docs/google-chat.md): Integrate Monte Carlo with Google Chat teams
@@ -221,6 +226,7 @@
 - [Data Collection: Details per Integration](https://docs.getmontecarlo.com/docs/data-collection-details-per-integration.md)
 - [Data Asset Validators](https://docs.getmontecarlo.com/docs/data-validators.md)
 - [Updating an Integration](https://docs.getmontecarlo.com/docs/updating-integrations.md)
+- [Federated and linked connections and assets](https://docs.getmontecarlo.com/docs/federated-and-linked-connections-and-assets.md)
 - [Overview](https://docs.getmontecarlo.com/docs/developer-resources.md)
 - [Monitors as Code](https://docs.getmontecarlo.com/docs/monitors-as-code.md)
 - [Setting Up Monitors as Code](https://docs.getmontecarlo.com/docs/setting-up-monitors-as-code.md): Step-by-step guide to your first MaC deployment.
@@ -364,6 +370,9 @@
 - [AI Agents - Architecture & Data Handling](https://docs.getmontecarlo.com/docs/ai-architecture-data-handling.md)
 - [AI Agents - Technical Specs](https://docs.getmontecarlo.com/docs/ai-technical-specs.md)
 - [Monte Carlo MCP Server Technical Overview](https://docs.getmontecarlo.com/docs/monte-carlo-mcp-server-technical-overview.md)
+- [Consumption Rates - Version 2.1](https://docs.getmontecarlo.com/docs/version-21.md)
+- [Consumption Rates - Metric Monitor Extended Scale - Version 2.1](https://docs.getmontecarlo.com/docs/consumption-rates-version-21-metrics.md)
+- [Consumption Rates - Version 1.1](https://docs.getmontecarlo.com/docs/consumption-rates-version-11.md)
 - [Chargebacks](https://docs.getmontecarlo.com/docs/chargebacks.md)
 - [Consumption of Monte Carlo credits](https://docs.getmontecarlo.com/docs/consumption-of-mc-credits.md)
 - [Consumption of warehouse resources](https://docs.getmontecarlo.com/docs/consumption-of-warehouse-resources.md)
@@ -431,7 +440,9 @@
 - [Retrieve existing Domain Names and UUIDs](https://docs.getmontecarlo.com/recipes/retrieve-existing-domain-names-and-uuids.md)
 
 ## Changelog
-- [**Monte Carlo AI is now a full data helpdesk in Slack**](https://docs.getmontecarlo.com/changelog/monte-carlo-ai-is-now-a-full-data-helpdesk-in-slack.md)
+- [Monitor metadata fields can now be required at creation](https://docs.getmontecarlo.com/changelog/monitor-metadata-fields-can-now-be-required-at-creation.md)
+- [Improvement to row counts for Custom SQL & Validation monitors on data lakes](https://docs.getmontecarlo.com/changelog/improvement-to-row-counts-for-custom-sql-validation-monitors-on-data-lakes.md)
+- [Monte Carlo AI is now a full data helpdesk in Slack](https://docs.getmontecarlo.com/changelog/monte-carlo-ai-is-now-a-full-data-helpdesk-in-slack.md)
 - [Automatic Triage is now enabled by default](https://docs.getmontecarlo.com/changelog/automatic-triage-is-now-enabled-for-all-accounts.md)
 - [Oracle thick mode support](https://docs.getmontecarlo.com/changelog/oracle-thick-mode-support.md)
 - [Network Access Controls are now manageable in the UI](https://docs.getmontecarlo.com/changelog/network-access-controls-are-now-manageable-in-the-ui.md)
@@ -439,5 +450,3 @@
 - [Domain filter on the Alerts page](https://docs.getmontecarlo.com/changelog/domain-filter-on-the-alerts-page.md)
 - [Trigger-based monitor schedules can now run trigger-only](https://docs.getmontecarlo.com/changelog/trigger-based-monitor-schedules-can-now-run-trigger-only.md)
 - [Automatic Conversation Clustering now available for Snowflake Cortex and Databricks Genie agents](https://docs.getmontecarlo.com/changelog/automatic-conversation-clustering-now-available-for-snowflake-cortex-and-databricks-genie-agents.md)
-- [OAuth 2.0 Support for the API, SDK, and CLI](https://docs.getmontecarlo.com/changelog/oauth-20-support-for-the-api-sdk-and-cli.md)
-- [Alert grouping by status](https://docs.getmontecarlo.com/changelog/alert-grouping-by-status.md)

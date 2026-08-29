@@ -1,0 +1,94 @@
+generated: '2026-08-29'
+method: searched
+source: >-
+  https://docs.getmontecarlo.com/docs/using-the-sdk (SDK page),
+  https://docs.getmontecarlo.com/docs/using-the-cli (CLI page),
+  https://github.com/monte-carlo-data/mc-agent-toolkit/blob/main/skills/instrument-agent/SKILL.md
+  (names the OpenTelemetry SDK), with version + release date read from the PyPI
+  JSON metadata endpoint (pypi.org/pypi/<pkg>/json) on 2026-08-29.
+provider: Monte Carlo
+providerId: monte-carlo-data
+note: >-
+  Monte Carlo's programmatic surface is Python-first. No first-party JavaScript,
+  Java, Go, Ruby, PHP or Rust client library was found on npm, Maven Central,
+  pkg.go.dev, RubyGems, Packagist or crates.io. The MCP server is reached over
+  HTTP with no vendor-published client package; key-based clients use the
+  third-party `mcp-remote` bridge, which is NOT a Monte Carlo package.
+packages:
+  - language: python
+    registry: pypi
+    name: pycarlo
+    url: https://pypi.org/project/pycarlo/
+    install: pip install pycarlo
+    official: true
+    version: 0.15.248
+    published: '2026-08-28'
+    role: sdk
+    docs: https://docs.getmontecarlo.com/docs/using-the-sdk
+    note: >-
+      Monte Carlo's Python SDK. Wraps the GraphQL API at
+      https://api.getmontecarlo.com/graphql and the Push Ingest API at
+      https://integrations.getmontecarlo.com (pycarlo.features.ingestion).
+      Actively released — latest version published one day before this probe.
+  - language: python
+    registry: pypi
+    name: montecarlodata
+    url: https://pypi.org/project/montecarlodata/
+    install: pip install -U montecarlodata
+    official: true
+    version: 0.175.0
+    published: '2026-08-13'
+    role: cli
+    docs: https://clidocs.getmontecarlo.com/
+    note: >-
+      Monte Carlo's CLI, installed as the `montecarlo` binary. Requires Python
+      3.10+. See cli/monte-carlo-data-cli.yml for the command surface.
+  - language: python
+    registry: pypi
+    name: montecarlo-opentelemetry
+    url: https://pypi.org/project/montecarlo-opentelemetry/
+    install: pip install montecarlo-opentelemetry
+    official: true
+    version: 0.4.0
+    published: '2026-06-12'
+    role: telemetry-sdk
+    license: Apache-2.0
+    docs: https://docs.getmontecarlo.com/docs/agent-monitors-overview
+    note: >-
+      OpenTelemetry SDK for Monte Carlo Agent Observability — emits GenAI spans
+      from instrumented Python agents. Named as first-party by Monte Carlo's own
+      instrument-agent Agent Skill.
+  - language: python
+    registry: github
+    name: mc-agent-toolkit
+    url: https://github.com/monte-carlo-data/mc-agent-toolkit
+    install: "git clone https://github.com/monte-carlo-data/mc-agent-toolkit && plugins/claude-code/scripts/install.sh"
+    official: true
+    version: v1.24.1
+    published: '2026-08-10'
+    role: agent-toolkit
+    license: Apache-2.0
+    note: >-
+      Official Monte Carlo toolkit for AI coding agents (Claude Code, Cursor,
+      Codex, Copilot, Cortex Code, opencode). Distributed from GitHub releases
+      only — probed npm for `mc-agent-toolkit` and `@montecarlodata/opencode-plugin`
+      on 2026-08-29, both 404, so there is no registry metadata endpoint to query;
+      version and date are the latest GitHub release tag. Ships the 19 Agent
+      Skills captured in skills/.
+registries_probed:
+  - registry: pypi
+    result: 3 first-party packages found
+  - registry: npm
+    result: no first-party package (searched registry, probed 3 candidate names — 404)
+  - registry: maven-central
+    result: none
+  - registry: nuget
+    result: none
+  - registry: pkg.go.dev
+    result: none
+  - registry: rubygems
+    result: none
+  - registry: packagist
+    result: none
+  - registry: crates.io
+    result: none

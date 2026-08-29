@@ -1,0 +1,86 @@
+generated: '2026-08-29'
+method: searched
+source: >-
+  https://docs.getmontecarlo.com/docs/integration-feature-lifecycles,
+  https://docs.getmontecarlo.com/changelog,
+  https://status.getmontecarlo.com/,
+  https://docs.getmontecarlo.com/docs/api-authentication
+provider: Monte Carlo
+providerId: monte-carlo-data
+versioning:
+  api_versioning: none
+  scheme: unversioned GraphQL endpoint
+  note: >-
+    The GraphQL API is served from a single unversioned endpoint,
+    https://api.getmontecarlo.com/graphql. There is no /v1/ path, no version
+    header and no published API version policy — evolution is handled the
+    GraphQL way, by additive field changes. The one versioned path segment on
+    the whole surface is the REST Push Ingest API (/ingest/v1/...).
+  rest_ingest: /ingest/v1/{metadata|lineage|querylogs}
+release_process:
+  model: continuous deployment (SaaS)
+  docs: https://docs.getmontecarlo.com/docs/integration-feature-lifecycles
+  phases:
+    - name: private preview
+      description: >-
+        Invitation-only pre-release. May lack features, carries no SLA and no
+        technical-support obligation; pre-GA terms apply.
+    - name: public preview
+      description: >-
+        Widely available and generally production-ready, with full technical
+        support, but may carry functional/scale limitations. Monte Carlo
+        explicitly reserves the right to make BREAKING CHANGES in this phase.
+    - name: general availability
+      description: Available to all customers and covered by SLAs where applicable.
+  note: >-
+    The Push Ingest API and the GitLab, Azure DevOps and ClickHouse integrations
+    are in public preview as of this pass, i.e. inside the breaking-change
+    window by Monte Carlo's own definition.
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  note: >-
+    No RFC 8594 Sunset/Deprecation header policy and no dated deprecation
+    schedule was found. Deprecation is signalled in the docs by naming a page
+    "[Legacy version]" or "deprecated" (e.g. the Tableau PAT integration, the
+    legacy Microsoft Teams integration) rather than by machine-readable header
+    or a published removal date.
+  observed_deprecations:
+    - item: Tableau PAT integration (CLI-only initial setup)
+      signal: 'docs page titled "Troubleshooting and FAQs: Tableau (PAT version, CLI-only)", slug ends -tableau-deprecated'
+      replacement: Tableau Connected Apps integration
+    - item: Microsoft Teams (legacy)
+      signal: '"[Legacy version] Microsoft Teams" docs page'
+      replacement: Microsoft Teams integration
+credential_lifecycle:
+  max_expiry: 1 year
+  applies_to:
+    - personal API keys
+    - MCP server keys
+    - personal OAuth clients
+  exempt: service OAuth clients (long-lived for production use)
+  rotation: >-
+    Each OAuth client holds up to two secrets so a rotation can be done with
+    zero downtime; a profile tab lists every credential with created/expiry
+    dates, one-click revoke and Revoke all.
+  source: https://docs.getmontecarlo.com/changelog/oauth-20-support-for-the-api-sdk-and-cli
+status_page:
+  url: https://status.getmontecarlo.com/
+  http_status: 200
+  vendor: Uptime.com
+  machine_readable: false
+  note: >-
+    A hosted Uptime.com status page. Probed /api/v2/status.json (the
+    Statuspage.io convention) — 404 — so there is no machine-readable status
+    feed at the usual location. Also listed as the `status` link in the
+    RFC 9727 api-catalog.
+sla:
+  published: false
+  note: >-
+    SLAs are referenced ("covered by SLAs where applicable" at GA) but no SLA
+    document is publicly published; pricing and terms are sales-gated.
+changelog:
+  url: https://docs.getmontecarlo.com/changelog
+  artifact: changelog/monte-carlo-data-changelog.yml

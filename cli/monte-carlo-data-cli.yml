@@ -1,0 +1,62 @@
+generated: '2026-08-29'
+method: searched
+source: >-
+  https://docs.getmontecarlo.com/docs/using-the-cli,
+  https://clidocs.getmontecarlo.com/ (HTTP 200),
+  https://pypi.org/project/montecarlodata/
+provider: Monte Carlo
+providerId: monte-carlo-data
+name: Monte Carlo CLI
+binary: montecarlo
+package: montecarlodata
+version: 0.175.0
+published: '2026-08-13'
+reference: https://clidocs.getmontecarlo.com/
+docs: https://docs.getmontecarlo.com/docs/using-the-cli
+requirements:
+  python: '>=3.10'
+install:
+  - method: pip
+    command: pip install -U montecarlodata
+verify: montecarlo --version
+configure:
+  interactive: montecarlo configure
+  api_key: montecarlo configure --api-key --mcd-id <KEY_ID> --mcd-token <SECRET>
+  oauth: >-
+    montecarlo configure --oauth --mcd-oauth-client-id <CLIENT_ID>
+    --mcd-oauth-client-secret <CLIENT_SECRET> --mcd-instance-id <INSTANCE_ID>
+  note: >-
+    The CLI performs the OAuth token exchange on every call once configured;
+    the instance ID (us1, eu1, ...) is required for the OAuth path and is shown
+    under Account Information -> Instance ID.
+  validate: montecarlo validate
+help:
+  general: montecarlo --help
+  group: montecarlo <group> --help
+  full_dump: montecarlo help
+command_groups:
+  - name: integrations
+    examples:
+      - montecarlo integrations list
+      - montecarlo integrations create-key --scope Ingestion --description "Push ingestion key"
+    note: Manage warehouse/BI/orchestration integrations and integration keys.
+  - name: monitors
+    examples:
+      - montecarlo monitors compile --namespace <namespace>
+      - montecarlo monitors apply --namespace <namespace>
+    note: >-
+      Monitors-as-Code. `compile` validates a YAML definition without deploying;
+      `apply` deploys it. The namespace is the unit of deployment.
+  - name: mcp
+    examples:
+      - montecarlo mcp create-key --description "Automation key"
+    note: MCP-server-scoped credential management. Requires CLI v0.141.4+.
+  - name: configure
+  - name: validate
+capabilities:
+  - Secret management with the CLI
+  - PII filtering (introduced in CLI v0.39.0 / pycarlo v0.4.0)
+note: >-
+  The command groups above are the ones Monte Carlo names in its public docs
+  and in its own Agent Skills. The full command surface is generated at
+  clidocs.getmontecarlo.com and is not enumerated here rather than being guessed.
