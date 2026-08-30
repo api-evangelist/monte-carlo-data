@@ -50,6 +50,17 @@ tags:
   - Agent Observability
   - Monitoring
   - GraphQL
+  - MCP
+  - OpenTelemetry
+  - Data Engineering
+tags_raw:
+  - AIOps
+  - Data Observability
+  - Data Quality
+  - Data Lineage
+  - Agent Observability
+  - Monitoring
+  - GraphQL
   - Model Context Protocol
   - OpenTelemetry
   - Data Engineering
@@ -126,6 +137,10 @@ apis:
     humanURL: https://docs.getmontecarlo.com/docs/mcp-server
     baseURL: https://mcp.getmontecarlo.com/mcp
     tags:
+      - MCP
+      - Agent Observability
+      - AIOps
+    tags_raw:
       - Model Context Protocol
       - Agent Observability
       - AIOps
