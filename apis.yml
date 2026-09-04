@@ -37,6 +37,7 @@ accessModel:
   label: Enterprise, sales-quoted
   confidence: high
   source:
+    - {url: 'https://www.montecarlodata.com', status: 301, note: 'declared website redirects to https://montecarlo.ai/ — a different registrable domain (montecarlodata.com -> montecarlo.ai), possible rename or acquisition (probed 2026-09-03, roadmap#169)'}
     - plans
     - https://montecarlo.ai/request-for-pricing/
   generated: '2026-08-29'
